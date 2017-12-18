@@ -1,21 +1,24 @@
-class Todo < ApplicationRecord
+class Todo < ActiveRecord::Base
   # model association
   has_many :items, dependent: :destroy
 
   # validations
   validates_presence_of :title, :created_by
 
-
-
-  after_create {|book| book.message 'create' }
-  after_update {|book| book.message 'update' }
-  after_destroy {|book| book.message 'destroy' }
+  after_create {|todo| todo.message 'create' }
+  after_update {|todo| todo.message 'update' }
+  after_destroy {|todo| todo.message 'destroy' }
 
   def message action
-    msg = { resource: 'books',
-            action: action,
-            id: self.id,
-            obj: self }
+    puts "processing action #{action}"
+
+    msg = {
+        resource: 'todos',
+        action: action,
+        id: self.id,
+        obj: self,
+        channel: "company_#{rand(1..2)}",
+    }
 
     $redis.publish 'rt-change', msg.to_json
   end

@@ -34,7 +34,8 @@ class TodosController < ApplicationController
 
   def todo_params
     # whitelist params
-    params.permit(:title, :created_by)
+    # params.permit(:title, :created_by)
+    ActiveModelSerializers::Deserialization.jsonapi_parse!(params, only: [:title, :created_by])
   end
 
   def set_todo
