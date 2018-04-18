@@ -9,8 +9,13 @@ class TodosController < ApplicationController
 
   # POST /todos
   def create
-    @todo = Todo.create!(todo_params)
-    json_response(@todo, :created)
+    @todo = Todo.new(todo_params)
+
+    if @todo.save
+      json_response(@todo, :created)
+    else
+      respond_with_errors(@todo)
+    end
   end
 
   # GET /todos/:id
@@ -20,8 +25,11 @@ class TodosController < ApplicationController
 
   # PUT /todos/:id
   def update
-    @todo.update(todo_params)
-    head :no_content
+    if @todo.update(todo_params)
+      head :no_content
+    else
+      respond_with_errors(@todo)
+    end
   end
 
   # DELETE /todos/:id
@@ -34,7 +42,8 @@ class TodosController < ApplicationController
 
   def todo_params
     # whitelist params
-    params.permit(:title, :created_by)
+    # params.permit(:title, :created_by)
+    ActiveModelSerializers::Deserialization.jsonapi_parse!(params, only: [:title, :created_by] )
   end
 
   def set_todo

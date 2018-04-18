@@ -5,18 +5,20 @@ class Todo < ApplicationRecord
   # validations
   validates_presence_of :title, :created_by
 
-
-
-  after_create {|book| book.message 'create' }
-  after_update {|book| book.message 'update' }
-  after_destroy {|book| book.message 'destroy' }
+  after_create { |todo| todo.message 'create' }
+  after_update { |todo| todo.message 'update' }
+  after_destroy { |todo| todo.message 'destroy' }
 
   def message action
-    msg = { resource: 'books',
-            action: action,
-            id: self.id,
-            obj: self }
+    msg = {
+      resource: 'todo',
+      action: action,
+      id: self.id,
+      obj: self
+    }
 
-    $redis.publish 'rt-change', msg.to_json
+    puts 'saved'
+
+    $redis.publish 'model-change', msg.to_json
   end
 end
